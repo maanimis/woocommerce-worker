@@ -1,4 +1,4 @@
-import { FromCsv, ProductType } from "@/constants";
+import { FromCsv, ProductFactory, ProductType } from "@/constants";
 
 export interface Product {
   [FromCsv.varID]: string;
@@ -9,4 +9,10 @@ export interface Product {
   [FromCsv.vipPrice]: string;
   [FromCsv.usedPrice]: string;
   _rawData?: Record<string, any>;
+}
+
+export interface OUTPUT {
+  success: boolean;
+  product: ProductFactory;
+  isVariation: boolean;
 }

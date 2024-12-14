@@ -1,4 +1,4 @@
-import { FromCsv } from "@/constants";
+import { FromCsv } from "../constants";
 import Joi from "joi";
 
 export const ProductValidator = Joi.object({

@@ -6,6 +6,7 @@ declare global {
       CONSUMER_SECRET: string;
       BATCH_SIZE: string;
       CSV_FILE_PATH: string;
+      CSV_FAILED_FILE_PATH: string;
     }
   }
 }

@@ -1,8 +1,8 @@
-import { parseCsv, exportCsv } from "./utils/csv";
+import { parseCsv, exportCsv, updateCsv } from "./utils/csv";
 import { updateProductPrice } from "./woocommerce/api";
 import chalk from "chalk";
 import * as dotenv from "dotenv";
-import { FromCsv } from "./constants";
+import { FromCsv, ProductFactory } from "./constants";
 
 const env = dotenv.config();
 if (env.error) {
@@ -10,14 +10,17 @@ if (env.error) {
 }
 
 async function main() {
+  const output_OK: ProductFactory[] = [];
+  const output_FAILED: ProductFactory[] = [];
+
   try {
     const filePath = process.env.CSV_FILE_PATH;
     const batchSize = +process.env.BATCH_SIZE;
     let totalUpdated = 0;
 
     console.log(chalk.blue("Reading and processing the CSV file..."));
-    const products = await parseCsv(filePath.trim());
-    const filterUnUsedPrice = products.filter(
+    const Products = await parseCsv(filePath.trim());
+    const filterUnUsedPrice = Products.filter(
       (product) => product[FromCsv.regularPrice] !== product[FromCsv.usedPrice]
     );
 
@@ -32,9 +35,20 @@ async function main() {
         chalk.magenta(`Processing batch of ${batch.length} products...`)
       );
 
-      await Promise.allSettled(
+      const updatedProducts = await Promise.allSettled(
         batch.map((product) => updateProductPrice(product))
       );
+
+      for (const newProduct of updatedProducts) {
+        if (newProduct.status === "fulfilled") {
+          const data = newProduct.value;
+          if (data.isVariation && data.success) {
+            output_OK.push(data.product);
+            continue;
+          }
+          output_FAILED.push(data.product);
+        }
+      }
 
       totalUpdated += batch.length;
 
@@ -43,8 +57,8 @@ async function main() {
       );
     }
 
-    // const finalData=[...products,...filterUnUsedPrice]
-    await exportCsv(filePath, filterUnUsedPrice);
+    await updateCsv(filePath, output_OK);
+    await exportCsv(process.env.CSV_FAILED_FILE_PATH, output_FAILED);
     console.log(
       chalk.green(`${totalUpdated} products have been successfully updated.`)
     );

@@ -15,10 +15,13 @@
     "@woocommerce/woocommerce-rest-api": "^1.0.1",
     "chalk": "^4.1.2",
     "dotenv": "^16.4.5",
+    "es-toolkit": "^1.29.0",
     "fast-csv": "^5.0.2",
-    "joi": "^17.13.3"
+    "joi": "^17.13.3",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.13",
     "@types/node": "^22.9.3",
     "@types/woocommerce__woocommerce-rest-api": "^1.0.5",
     "tsx": "^4.19.2",
